@@ -1,13 +1,19 @@
 <script setup>
 import CommentsList from '@/components/CommentsList.vue';
 import { defineProps } from 'vue';
+import { useRouter } from 'vue-router';
 
-const { title, score, account, time, link, comments } = defineProps(['title', 'score', 'account', 'time', 'link', 'comments']);
+const router = useRouter();
+const { postId, title, score, account, time, link, comments } = defineProps(['postId','title', 'score', 'account', 'time', 'link', 'comments']);
+
+const navigateToPost = () => {
+    router.push(`/post-comments/${postId}`)
+}
 
 </script>
 <template>
     <div class="container">
-        <p class="title">{{ title }}</p>
+        <p class="title" @click="navigateToPost">{{ title }}</p>
         <div class="info-container">
             <div class="icon-label-container">
                 <img src="../assets/heart-icon.svg" alt="score icon">
@@ -23,8 +29,6 @@ const { title, score, account, time, link, comments } = defineProps(['title', 's
             </div>
             <a class="link" :href="link" target="_blank">{{ link }}</a>
         </div>
-        <CommentsList :comments="comments" />
-
     </div>
 </template>
 
@@ -36,6 +40,12 @@ const { title, score, account, time, link, comments } = defineProps(['title', 's
     background-color: white;
     padding: 1.5em 3em;
     margin: 1em;
+}
+
+.title{
+    font-size: 1.5em;
+    cursor: pointer;
+    width: max-content;
 }
 
 .info-container {

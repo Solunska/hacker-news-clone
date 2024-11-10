@@ -11,7 +11,7 @@ const router = createRouter({
             component: HomeView
         },
         {
-            path: "/post-comments",
+            path: "/post-comments/:id",
             name: "post comments page",
             component: PostCommentsView
         }
