@@ -1,8 +1,9 @@
 <script setup>
-import IconLabel from '@/components/IconLabel.vue';
+import CommentsList from '@/components/CommentsList.vue';
 import { defineProps } from 'vue';
 
-const { title, score, account, time, link } = defineProps(['title', 'score', 'account', 'time', 'link']);
+const { title, score, account, time, link, comments } = defineProps(['title', 'score', 'account', 'time', 'link', 'comments']);
+
 </script>
 <template>
     <div class="container">
@@ -22,6 +23,8 @@ const { title, score, account, time, link } = defineProps(['title', 'score', 'ac
             </div>
             <a class="link">{{ link }}</a>
         </div>
+        <CommentsList :comments="comments" />
+
     </div>
 </template>
 
