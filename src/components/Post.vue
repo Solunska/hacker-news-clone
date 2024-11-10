@@ -21,7 +21,7 @@ const { title, score, account, time, link, comments } = defineProps(['title', 's
                 <img src="../assets/clock-icon.svg" alt="clock icon">
                 <p class="label">{{ time }}</p>
             </div>
-            <a class="link">{{ link }}</a>
+            <a class="link" :href="link" target="_blank">{{ link }}</a>
         </div>
         <CommentsList :comments="comments" />
 

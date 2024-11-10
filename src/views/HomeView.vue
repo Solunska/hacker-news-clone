@@ -5,17 +5,7 @@ import Posts from '@/components/Posts.vue';
 
 <template>
     <NavBar />
-    <Suspense >
-        <template #default>
-            <Posts />
-        </template>
-        <template #fallback>
-            <div>
-                <p>Loading...</p>
-            </div>
-        </template>
-    </Suspense>
-
+    <Posts />
 </template>
 
 <style scoped></style>
