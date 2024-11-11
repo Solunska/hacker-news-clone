@@ -5,6 +5,7 @@ import { fetchTopStories, loadPosts } from '../../apiService';
 import { ref, watch, onMounted } from 'vue';
 import Loading from './Loading.vue';
 import { useRouter, useRoute } from 'vue-router';
+import { cacheData, getCachedData } from '@/utils/localStorage.js';
 
 const paginationStore = usePaginationStore();
 const postsIDs = ref([]);
@@ -14,13 +15,33 @@ const router = useRouter();
 const route = useRoute();
 
 onMounted(async () => {
-    postsIDs.value = await fetchTopStories();
-    posts.value = await loadPosts(postsIDs.value, paginationStore.from, paginationStore.to);
+    const cacheKey = `api-cache-${paginationStore.from}-${paginationStore.to}`;
+    const cachedData = getCachedData(cacheKey);
+
+    if (cachedData) {
+        postsIDs.value = await fetchTopStories();
+        posts.value = cachedData;
+    } else {
+        postsIDs.value = await fetchTopStories();
+        posts.value = await loadPosts(postsIDs.value, paginationStore.from, paginationStore.to);
+        cacheData(cacheKey, posts.value);
+    }
 });
 
+
 watch(() => [paginationStore.from, paginationStore.to], async () => {
-    posts.value = await loadPosts(postsIDs.value, paginationStore.from, paginationStore.to);
+    const cacheKey = `api-cache-${paginationStore.from}-${paginationStore.to}`;
+    const cachedData = getCachedData(cacheKey);
+    console.log('Pagination change:', paginationStore.from, paginationStore.to);
+    console.log('Cached data for new page:', cachedData);
     router.push({ path: route.path, query: { from: paginationStore.from, to: paginationStore.to } });
+
+    if (cachedData) {
+        posts.value = cachedData;
+    } else {
+        posts.value = await loadPosts(postsIDs.value, paginationStore.from, paginationStore.to);
+        cacheData(cacheKey, posts.value);
+    }
 });
 
 
