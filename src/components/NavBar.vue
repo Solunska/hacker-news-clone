@@ -7,7 +7,7 @@ import { RouterLink } from 'vue-router';
         <ul>
             <li>
                 <RouterLink to="/">
-                    <img src="../assets/logo.png" alt="logo of the app">
+                    <img src="@/assets/logo.png" alt="logo of the app">
                     <p>Search Hacker News</p>
                 </RouterLink>
             </li>

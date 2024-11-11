@@ -1,24 +1,28 @@
 <script setup>
 import Post from '@/components/Post.vue';
+import { usePaginationStore } from '../store/pagination.js'
 import { fetchTopStories, loadPosts } from '../../apiService';
 import { ref, watch, onMounted } from 'vue';
 import Loading from './Loading.vue';
+import { useRouter, useRoute } from 'vue-router';
 
-let postsIDs = [];
+const paginationStore = usePaginationStore();
+const postsIDs = ref([]);
 const posts = ref(null);
-const postRange = ref({
-    from: 0,
-    to: 10
-});
+
+const router = useRouter();
+const route = useRoute();
 
 onMounted(async () => {
-    postsIDs = await fetchTopStories();
-    posts.value = await loadPosts(postsIDs, postRange.value.from, postRange.value.to);
+    postsIDs.value = await fetchTopStories();
+    posts.value = await loadPosts(postsIDs.value, paginationStore.from, paginationStore.to);
 });
 
-watch(postRange.value, async () => {
-    posts.value = await loadPosts(postsIDs, postRange.value.from, postRange.value.to);
+watch(() => [paginationStore.from, paginationStore.to], async () => {
+    posts.value = await loadPosts(postsIDs.value, paginationStore.from, paginationStore.to);
+    router.push({ path: route.path, query: { from: paginationStore.from, to: paginationStore.to } });
 });
+
 
 console.log(posts);
 
@@ -29,6 +33,11 @@ console.log(posts);
         <h1>Top Stories</h1>
         <Post v-for="post in posts" :key="post.id" :postId="post.id" :title="post.title" :score="post.score"
             :account="post.by" :time="post.time" :link="post.url" :comments="post.comments" />
+        <div class="pagination">
+            <button @click="paginationStore.decrementRange" :disabled="paginationStore.from <= 0">Previous</button>
+            <button @click="paginationStore.incrementRange"
+                :disabled="paginationStore.to >= postsIDs.length">Next</button>
+        </div>
     </div>
     <Loading v-else />
 </template>
@@ -36,6 +45,26 @@ console.log(posts);
 <style scoped>
 h1 {
     margin: 1em;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    margin: 1em;
+}
+
+button {
+    padding: 0.5em 1em;
+    background-color: #ff6600;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 2em;
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
 }
 
 @keyframes blinker {
