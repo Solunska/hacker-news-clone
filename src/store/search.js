@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 
-// Add a computed property to filter posts based on the search query
 export const useSearchStore = defineStore('search', {
     state: () => ({
         query: '',
