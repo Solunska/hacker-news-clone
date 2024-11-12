@@ -17,6 +17,10 @@ export const usePaginationStore = defineStore('pagination', {
         decrementRange() {
             this.from -= 10;
             this.to -= 10;
+        },
+        resetRange() {
+            this.from = 0;
+            this.to = 10;
         }
     }
 });

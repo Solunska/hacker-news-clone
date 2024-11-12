@@ -8,7 +8,17 @@ import { createPinia } from 'pinia';
 const app = createApp(App);
 const pinia = createPinia();
 
-app.use(router);
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+                console.log("Service Worker registration successful: ", registration)
+            }, (err) => {
+                console.log("Registration failed: ", err)
+            })
+    })
+}
 app.use(pinia);
+app.use(router);
 
 app.mount('#app')

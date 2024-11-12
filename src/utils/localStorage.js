@@ -10,11 +10,12 @@ export const cacheData = (key, data) => {
 
 export function getCachedData(key) {
     try {
+        console.log('Getting data from localStorage...');
+
         const data = localStorage.getItem(key);
-        if (data && (data.startsWith("{") || data.startsWith("[")))  {
+        if (data && (data.startsWith("{") || data.startsWith("["))) {
             return JSON.parse(data);
         } else {
-            console.warn(`Data for key ${key} is not valid JSON:`, data);
             return null;
         }
     } catch (error) {

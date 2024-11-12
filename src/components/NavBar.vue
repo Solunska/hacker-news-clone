@@ -1,19 +1,39 @@
 <script setup>
+import { usePaginationStore } from '@/store/pagination';
 import { RouterLink } from 'vue-router';
+import { ref } from 'vue';
+import { useSearchStore } from '@/store/search';
+
+const paginationStore = usePaginationStore();
+const searchStore = useSearchStore();
+
+const searchQuery = ref(searchStore.query);
+const handleSearch = () => {
+    searchStore.setQuery(searchQuery.value);
+    paginationStore.resetRange();
+};
+
+const resetPage = () => {
+    paginationStore.resetRange();
+    searchStore.setQuery(''); 
+    searchQuery.value = '';  
+};
 </script>
 
 <template>
     <nav>
         <ul>
             <li>
-                <RouterLink to="/">
+                <RouterLink to="/?from=0&to=10"
+                    @click="resetPage">
                     <img src="@/assets/logo.png" alt="logo of the app">
                     <p>Search Hacker News</p>
                 </RouterLink>
             </li>
             <li>
                 <img class="search-icon" src="../assets/search-icon.svg" alt="">
-                <input type="text" placeholder="Search stories by title, url, or author">
+                <input v-model="searchQuery" @input="handleSearch" type="text"
+                    placeholder="Search stories by title, url, or author">
             </li>
         </ul>
     </nav>
@@ -22,7 +42,7 @@ import { RouterLink } from 'vue-router';
 <style scoped>
 nav {
     height: 5em;
-    background-color: white ;
+    background-color: white;
     padding: 1em 0;
 }
 

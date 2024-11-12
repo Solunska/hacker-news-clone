@@ -6,7 +6,7 @@ import CommentsList from '@/components/CommentsList.vue';
 import Loading from '@/components/Loading.vue';
 import Post from '@/components/Post.vue';
 import NavBar from '@/components/NavBar.vue';
-import { cacheData, getCachedData } from '@/utils/localStorage';
+import { cacheData, getCachedData } from '@/utils/indexDB';
 
 const route = useRoute();
 const postId = parseInt(route.params.id);
@@ -15,7 +15,7 @@ const post = ref(null);
 
 onMounted(async () => {
     const cacheKey = `api-cache-${postId}`;
-    const cachedPost = getCachedData(cacheKey);
+    const cachedPost = await getCachedData(cacheKey);
 
     if (cachedPost) {
         post.value = cachedPost;

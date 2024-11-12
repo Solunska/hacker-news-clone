@@ -42,10 +42,16 @@ export const fetchComments = async (commentIds) => {
     return Promise.all(commentPromises);
 };
 
-export const loadPosts = async (postsIDs, from, to) => {
+export const loadPostsWithPagination = async (postsIDs, from, to) => {
     const slicedPostIds = postsIDs.slice(from, to);
 
     const postPromises = slicedPostIds.map(postId => fetchPostData(postId));
+    const response = await Promise.all(postPromises);
+    return response;
+};
+
+export const loadPosts = async (postsIDs) => {
+    const postPromises = postsIDs.map(postId => fetchPostData(postId));
     const response = await Promise.all(postPromises);
     return response;
 };

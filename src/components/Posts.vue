@@ -1,49 +1,85 @@
 <script setup>
 import Post from '@/components/Post.vue';
 import { usePaginationStore } from '../store/pagination.js'
-import { fetchTopStories, loadPosts } from '../../apiService';
+import { fetchTopStories, loadPostsWithPagination, loadPosts } from '../../apiService';
 import { ref, watch, onMounted } from 'vue';
 import Loading from './Loading.vue';
 import { useRouter, useRoute } from 'vue-router';
-import { cacheData, getCachedData } from '@/utils/localStorage.js';
+import { cacheData, getCachedData } from '@/utils/indexDB.js';
+import { useSearchStore } from '@/store/search.js';
 
 const paginationStore = usePaginationStore();
+const searchStore = useSearchStore();
 const postsIDs = ref([]);
 const posts = ref(null);
+const allPosts = ref(null);
+const hasPagination = ref(true);
 
 const router = useRouter();
 const route = useRoute();
 
-onMounted(async () => {
-    const cacheKey = `api-cache-${paginationStore.from}-${paginationStore.to}`;
-    const cachedData = getCachedData(cacheKey);
+let debounceTimeout = null;
 
+const goToTopAndChangePage = (direction) => {
+    window.scrollTo(0, 0);
+
+    if (direction === 'prev') {
+        paginationStore.decrementRange();
+    } else if (direction === 'next') {
+        paginationStore.incrementRange();
+    }
+};
+
+const fetchPosts = async () => {
+    const cacheKey = `api-cache-${paginationStore.from}-${paginationStore.to}`;
+    const cachedData = await getCachedData(cacheKey);
     if (cachedData) {
-        postsIDs.value = await fetchTopStories();
         posts.value = cachedData;
     } else {
-        postsIDs.value = await fetchTopStories();
-        posts.value = await loadPosts(postsIDs.value, paginationStore.from, paginationStore.to);
+        posts.value = await loadPostsWithPagination(postsIDs.value, paginationStore.from, paginationStore.to);
         cacheData(cacheKey, posts.value);
     }
-});
+};
 
+onMounted(async () => {
+    const allCachedData = await getCachedData('all-data');
+    postsIDs.value = await fetchTopStories();
+
+    fetchPosts();
+
+    if (allCachedData) {
+        allPosts.value = allCachedData;
+    } else {
+        allPosts.value = await loadPosts(postsIDs.value);
+        cacheData('all-data', allPosts.value);
+    }
+});
 
 watch(() => [paginationStore.from, paginationStore.to], async () => {
-    const cacheKey = `api-cache-${paginationStore.from}-${paginationStore.to}`;
-    const cachedData = getCachedData(cacheKey);
-    console.log('Pagination change:', paginationStore.from, paginationStore.to);
-    console.log('Cached data for new page:', cachedData);
+    fetchPosts();
+
     router.push({ path: route.path, query: { from: paginationStore.from, to: paginationStore.to } });
 
-    if (cachedData) {
-        posts.value = cachedData;
-    } else {
-        posts.value = await loadPosts(postsIDs.value, paginationStore.from, paginationStore.to);
-        cacheData(cacheKey, posts.value);
+    if (searchStore.query && allPosts.value) {
+        posts.value = searchStore.filteredPosts(allPosts.value);
     }
 });
 
+watch(() => searchStore.query, (newQuery) => {
+    if (debounceTimeout) {
+        clearTimeout(debounceTimeout);
+    }
+
+    debounceTimeout = setTimeout(() => {
+        if (newQuery) {
+            posts.value = searchStore.filteredPosts(allPosts.value);
+            hasPagination.value = false;
+        } else {
+            hasPagination.value = true;
+            fetchPosts();
+        }
+    }, 500);
+});
 
 console.log(posts);
 
@@ -54,10 +90,9 @@ console.log(posts);
         <h1>Top Stories</h1>
         <Post v-for="post in posts" :key="post.id" :postId="post.id" :title="post.title" :score="post.score"
             :account="post.by" :time="post.time" :link="post.url" :comments="post.comments" />
-        <div class="pagination">
-            <button @click="paginationStore.decrementRange" :disabled="paginationStore.from <= 0">Previous</button>
-            <button @click="paginationStore.incrementRange"
-                :disabled="paginationStore.to >= postsIDs.length">Next</button>
+        <div v-if="hasPagination" class="pagination">
+            <button @click="goToTopAndChangePage('prev')" :disabled="paginationStore.from <= 0">Previous</button>
+            <button @click="goToTopAndChangePage('next')" :disabled="paginationStore.to >= 500">Next</button>
         </div>
     </div>
     <Loading v-else />
