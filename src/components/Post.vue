@@ -1,14 +1,16 @@
 <script setup>
-import CommentsList from '@/components/CommentsList.vue';
 import { defineProps } from 'vue';
 import { useRouter } from 'vue-router';
+import { formatDate } from '@/utils/dateFormater';
 
 const router = useRouter();
-const { postId, title, score, account, time, link, comments } = defineProps(['postId','title', 'score', 'account', 'time', 'link', 'comments']);
+const { postId, title, score, account, time, link, comments } = defineProps(['postId', 'title', 'score', 'account', 'time', 'link', 'comments']);
 
 const navigateToPost = () => {
     router.push(`/post-comments/${postId}`)
 }
+
+const formattedDate = formatDate(time);
 
 </script>
 <template>
@@ -25,7 +27,7 @@ const navigateToPost = () => {
             </div>
             <div class="icon-label-container">
                 <img src="../assets/clock-icon.svg" alt="clock icon">
-                <p class="label">{{ time }}</p>
+                <p class="label">{{ formattedDate }}</p>
             </div>
             <a class="link" :href="link" target="_blank">{{ link }}</a>
         </div>
@@ -42,7 +44,7 @@ const navigateToPost = () => {
     margin: 1em;
 }
 
-.title{
+.title {
     font-size: 1.5em;
     cursor: pointer;
     width: max-content;

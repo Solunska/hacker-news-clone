@@ -1,8 +1,4 @@
 import axios from "axios";
-
-const API_URL = 'https://hacker-news.firebaseio.com/v0/';
-const TOP_STORES_ENDPOINT = 'topstories.json';
-
 export const fetchTopStories = async () => {
     const response = await axios.get('https://hacker-news.firebaseio.com/v0/topstories.json');
     return response.data;

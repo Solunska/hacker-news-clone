@@ -5,7 +5,7 @@ import { fetchTopStories, loadPostsWithPagination, loadPosts } from '../../apiSe
 import { ref, watch, onMounted } from 'vue';
 import Loading from './Loading.vue';
 import { useRouter, useRoute } from 'vue-router';
-import { cacheData, getCachedData } from '@/utils/indexDB.js';
+import { cacheData, getCachedData } from '@/utils/localStorage.js';
 import { useSearchStore } from '@/store/search.js';
 
 const paginationStore = usePaginationStore();

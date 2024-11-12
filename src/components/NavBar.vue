@@ -72,7 +72,7 @@ li:nth-of-type(2) {
 p {
     margin: 0;
     font-size: 2em;
-    width: 5.5em;
+    width: 6em;
     color: #717171;
 }
 

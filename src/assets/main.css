@@ -1,6 +1,7 @@
 body {
   margin: 0;
   background-color: #f0f0f0;
+  font-family: Arial, sans-serif;
 }
 
 code,
@@ -9,4 +10,23 @@ p {
   white-space: pre-wrap;
   word-wrap: break-word;
   display: block;
+}
+
+@media (max-width:1200px) {
+  body {
+    font-size: 12px;
+  }
+}
+
+@media (max-width:768px) {
+  body {
+    font-size: 10px;
+  }
+}
+
+
+@media (max-width:600px) {
+  body {
+    font-size: 8px;
+  }
 }
